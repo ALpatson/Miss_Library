@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
-    "@tanstack/react-router": "^1.132.45",
-    "antd": "^5.27.4",
-    "axios": "^1.12.2",
+    "@tanstack/react-router": "^1.134.4",
+    "antd": "^5.27.6",
+    "axios": "^1.13.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
