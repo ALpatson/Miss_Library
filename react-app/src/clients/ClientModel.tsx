@@ -1,6 +1,4 @@
 
-// react-app/src/clients/ClientModel.tsx
-
 export interface Client {
   id: number;
   firstName: string;

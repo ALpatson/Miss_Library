@@ -1,4 +1,4 @@
-// react-app/src/clients/pages/ClientsPage.tsx
+
 
 import { useState } from 'react';
 import { Button, Card, Empty, Breadcrumb } from 'antd';

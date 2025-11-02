@@ -1,4 +1,4 @@
-// nest-api/src/modules/clients/client.service.ts
+
 
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ClientRepository } from './client.repository';

@@ -1,4 +1,4 @@
-// nest-api/src/modules/clients/client.dto.ts
+
 
 import { IsString, IsEmail, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
 

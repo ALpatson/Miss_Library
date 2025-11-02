@@ -1,4 +1,4 @@
-// nest-api/src/modules/clients/client.model.ts
+
 
 export interface ClientModel {
   id: number;

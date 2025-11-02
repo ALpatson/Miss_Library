@@ -1,4 +1,4 @@
-// react-app/src/clients/providers/useClientProvider.tsx
+
 
 import { useEffect, useState, useCallback } from 'react';
 import api from '../../api';

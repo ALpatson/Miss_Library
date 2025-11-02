@@ -1,4 +1,4 @@
-// nest-api/src/modules/clients/entities/client.entity.ts
+
 
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 

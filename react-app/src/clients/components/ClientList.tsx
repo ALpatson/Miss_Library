@@ -1,4 +1,4 @@
-// react-app/src/clients/components/ClientList.tsx
+
 
 import { Table, Space, Button, Avatar, Modal } from 'antd';
 import { DeleteOutlined, UserOutlined } from '@ant-design/icons';

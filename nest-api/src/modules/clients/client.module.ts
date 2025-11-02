@@ -1,4 +1,4 @@
-// nest-api/src/modules/clients/client.module.ts
+
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
