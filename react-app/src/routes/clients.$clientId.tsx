@@ -1,16 +1,19 @@
-// react-app/src/routes/clients.$clientId.tsx
 
+
+import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { Card, Descriptions, Table, Empty, Breadcrumb, Spin } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import { Link, useParams } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import api from '../api';
 import type { Client, Purchase } from '../clients/ClientModel';
 
-export default function ClientDetailsPage() {
-  const params = useParams({ strict: false }) as { clientId: string };
-  const clientId = params.clientId;
-  
+export const Route = createFileRoute('/clients/$clientId')({
+  component: ClientDetailsPage,
+});
+
+function ClientDetailsPage() {
+  const { clientId } = Route.useParams();
   const [client, setClient] = useState<Client | null>(null);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,20 +75,26 @@ export default function ClientDetailsPage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Breadcrumb style={{ marginBottom: '16px' }}>
-        <Breadcrumb.Item>
-          <Link to="/">
-            <HomeOutlined />
-          </Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          {/* @ts-ignore */}
-          <Link to="/clients">Clients</Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          {client.firstName} {client.lastName}
-        </Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ marginBottom: '16px' }}
+        items={[
+          {
+            title: (
+              // @ts-ignore
+              <Link to="/">
+                <HomeOutlined />
+              </Link>
+            ),
+          },
+          {
+            // @ts-ignore
+            title: <Link to="/clients">Clients</Link>,
+          },
+          {
+            title: client ? `${client.firstName} ${client.lastName}` : 'Loading...',
+          },
+        ]}
+      />
 
       <h1>
         {client.firstName} {client.lastName}

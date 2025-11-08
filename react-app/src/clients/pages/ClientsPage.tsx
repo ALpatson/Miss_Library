@@ -14,14 +14,22 @@ export default function ClientsPage() {
 
   return (
     <div style={{ padding: '24px' }}>
-      <Breadcrumb style={{ marginBottom: '16px' }}>
-        <Breadcrumb.Item>
-          <Link to="/">
-            <HomeOutlined />
-          </Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>Clients</Breadcrumb.Item>
-      </Breadcrumb>
+      <Breadcrumb
+        style={{ marginBottom: '16px' }}
+        items={[
+          {
+            title: (
+              // @ts-ignore
+              <Link to="/">
+                <HomeOutlined />
+              </Link>
+            ),
+          },
+          {
+            title: 'Clients',
+          },
+        ]}
+      />
 
       <div
         style={{
