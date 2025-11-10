@@ -1,10 +1,7 @@
-
-
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { Card, Descriptions, Table, Empty, Breadcrumb, Spin } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import { Link } from '@tanstack/react-router';
 import api from '../api';
 import type { Client, Purchase } from '../clients/ClientModel';
 
@@ -27,8 +24,13 @@ function ClientDetailsPage() {
         const clientRes = await api.get<Client>(`/clients/${clientId}`);
         setClient(clientRes.data);
 
-        const purchasesRes = await api.get<Purchase[]>(`/clients/${clientId}/purchases`);
-        setPurchases(purchasesRes.data || []);
+        try {
+          const purchasesRes = await api.get<Purchase[]>(`/clients/${clientId}/purchases`);
+          setPurchases(purchasesRes.data || []);
+        } catch (err) {
+          console.warn('Could not load purchases:', err);
+          setPurchases([]);
+        }
       } catch (err) {
         console.error('Failed to load client:', err);
       } finally {
@@ -60,16 +62,38 @@ function ClientDetailsPage() {
       title: 'Book Title',
       dataIndex: ['book', 'title'],
       key: 'title',
+      render: (_: unknown, record: Purchase) => {
+        const bookPath = `/books/${record.book.id}`;
+        return (
+          <a 
+            href={bookPath} 
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = bookPath;
+            }}
+            style={{ color: '#1890ff', cursor: 'pointer' }}
+          >
+            {record.book.title}
+          </a>
+        );
+      },
     },
     {
       title: 'Author',
-      dataIndex: ['book', 'author', 'name'],
       key: 'author',
+      render: (_: unknown, record: Purchase) => {
+        const author = record.book.author;
+        if (!author) return '—';
+        return author.firstName && author.lastName 
+          ? `${author.firstName} ${author.lastName}`
+          : author.name || '—';
+      },
     },
     {
       title: 'Purchase Date',
       dataIndex: 'date',
       key: 'date',
+      render: (date: string) => new Date(date).toLocaleDateString(),
     },
   ];
 
@@ -80,15 +104,17 @@ function ClientDetailsPage() {
         items={[
           {
             title: (
-              // @ts-ignore
-              <Link to="/">
+              <a href="/" onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}>
                 <HomeOutlined />
-              </Link>
+              </a>
             ),
           },
           {
-            // @ts-ignore
-            title: <Link to="/clients">Clients</Link>,
+            title: (
+              <a href="/clients" onClick={(e) => { e.preventDefault(); window.location.href = '/clients'; }}>
+                Clients
+              </a>
+            ),
           },
           {
             title: client ? `${client.firstName} ${client.lastName}` : 'Loading...',

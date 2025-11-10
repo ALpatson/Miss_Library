@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { SaleRepository } from '../sales/sale.repository';
 import {
   BookModel,
   CreateBookModel,
@@ -9,7 +10,10 @@ import { BookRepository } from './book.repository';
 
 @Injectable()
 export class BookService {
-  constructor(private readonly bookRepository: BookRepository) {}
+  constructor(
+    private readonly bookRepository: BookRepository,
+    private readonly saleRepository: SaleRepository,
+  ) {}
 
   public async getAllBooks(
     input?: FilterBooksModel,
@@ -39,5 +43,9 @@ export class BookService {
 
   public async deleteBook(id: string): Promise<void> {
     await this.bookRepository.deleteBook(id);
+  }
+
+  public async findBuyers(id: string): Promise<any[]> {
+    return this.saleRepository.findByBookId(id);
   }
 }

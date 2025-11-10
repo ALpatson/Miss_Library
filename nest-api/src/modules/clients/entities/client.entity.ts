@@ -1,6 +1,7 @@
 
 
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Sale } from '../../sales/entities/sale.entity';
 
 @Entity('clients')
 export class Client {
@@ -19,7 +20,6 @@ export class Client {
   @Column({ type: 'varchar', length: 500, nullable: true })
   photoUrl: string | null;
 
-  // We'll add the sales relationship later when we create the Sale entity
-  // @OneToMany(() => Sale, (sale) => sale.client)
-  // sales: Sale[];
+  @OneToMany(() => Sale, (sale) => sale.client)
+  sales: Sale[];
 }

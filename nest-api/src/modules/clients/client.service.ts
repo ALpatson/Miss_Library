@@ -1,13 +1,15 @@
-
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ClientRepository } from './client.repository';
 import { CreateClientDto, UpdateClientDto } from './client.dto';
 import { Client } from './entities/client.entity';
+import { SaleRepository } from '../sales/sale.repository';
 
 @Injectable()
 export class ClientService {
-  constructor(private readonly clientRepository: ClientRepository) {}
+  constructor(
+    private readonly clientRepository: ClientRepository,
+    private readonly saleRepository: SaleRepository,
+  ) {}
 
   async findAll(): Promise<Client[]> {
     return this.clientRepository.findAllWithBooksCount();
@@ -49,5 +51,10 @@ export class ClientService {
   async remove(id: number): Promise<void> {
     const client = await this.findOne(id);
     await this.clientRepository.remove(client);
+  }
+
+  async findPurchases(id: number): Promise<any[]> {
+    const client = await this.findOne(id);
+    return this.saleRepository.findByClientId(client.id);
   }
 }

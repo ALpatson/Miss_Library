@@ -1,44 +1,55 @@
-
-
-import { Table, Space, Button, Avatar, Modal } from 'antd';
-import { DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import { Link } from '@tanstack/react-router';
-import type { ColumnsType } from 'antd/es/table';
-import type { Client } from '../ClientModel';
+import { useState } from 'react'
+import { Table, Space, Button, Avatar, Modal } from 'antd'
+import { DeleteOutlined, UserOutlined } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
+import type { Client } from '../ClientModel'
 
 interface ClientListProps {
-  data: Client[] | null;
-  loading: boolean;
-  onDelete: (id: number) => void;
+  data: Client[] | null
+  loading: boolean
+  onDelete: (id: number) => void
 }
 
 export default function ClientList({ data, loading, onDelete }: ClientListProps) {
-  const handleDelete = (client: Client): void => {
-    Modal.confirm({
-      title: 'Delete Client',
-      content: `Are you sure you want to delete ${client.firstName} ${client.lastName}?`,
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: () => onDelete(client.id),
-    });
-  };
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
+
+  const handleDeleteClick = (client: Client): void => {
+    setClientToDelete(client)
+    setDeleteModalOpen(true)
+  }
+
+  const handleConfirmDelete = async (): Promise<void> => {
+    if (!clientToDelete) return
+    await onDelete(clientToDelete.id)
+    setDeleteModalOpen(false)
+    setClientToDelete(null)
+  }
 
   const columns: ColumnsType<Client> = [
     {
       title: 'Name',
       key: 'name',
-      render: (_: unknown, record: Client) => (
-        <Space>
-          <Avatar src={record.photoUrl} icon={<UserOutlined />}>
-            {!record.photoUrl && record.firstName?.[0]}
-          </Avatar>
-          {/* @ts-ignore - route will be created next */}
-          <Link to={`/clients/${record.id}`}>
-            {record.firstName} {record.lastName}
-          </Link>
-        </Space>
-      ),
+      render: (_: unknown, record: Client) => {
+        const clientPath = `/clients/${record.id}`
+        return (
+          <Space>
+            <Avatar src={record.photoUrl} icon={<UserOutlined />}>
+              {!record.photoUrl && record.firstName?.[0]}
+            </Avatar>
+            <a
+              href={clientPath}
+              onClick={e => {
+                e.preventDefault()
+                window.location.href = clientPath
+              }}
+              style={{ color: '#1890ff', cursor: 'pointer' }}
+            >
+              {record.firstName} {record.lastName}
+            </a>
+          </Space>
+        )
+      },
     },
     {
       title: 'Email',
@@ -61,22 +72,43 @@ export default function ClientList({ data, loading, onDelete }: ClientListProps)
             danger
             size="small"
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
+            onClick={() => handleDeleteClick(record)}
           >
             Delete
           </Button>
         </Space>
       ),
     },
-  ];
+  ]
 
   return (
-    <Table<Client>
-      rowKey="id"
-      dataSource={data ?? []}
-      columns={columns}
-      loading={loading}
-      pagination={{ pageSize: 10 }}
-    />
-  );
+    <>
+      <Table<Client>
+        rowKey="id"
+        dataSource={data ?? []}
+        columns={columns}
+        loading={loading}
+        pagination={{ pageSize: 10 }}
+      />
+
+      <Modal
+        title="Delete Client"
+        open={deleteModalOpen}
+        onOk={handleConfirmDelete}
+        onCancel={() => setDeleteModalOpen(false)}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+      >
+        {clientToDelete && (
+          <p>
+            Are you sure you want to delete{' '}
+            <strong>
+              {clientToDelete.firstName} {clientToDelete.lastName}
+            </strong>
+            ?
+          </p>
+        )}
+      </Modal>
+    </>
+  )
 }

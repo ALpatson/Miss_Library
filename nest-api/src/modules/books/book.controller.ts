@@ -35,6 +35,11 @@ export class BookController {
     };
   }
 
+  @Get(':id/buyers')
+  async getBuyers(@Param('id') id: string): Promise<any[]> {
+    return this.bookService.findBuyers(id);
+  }
+
   @Get(':id')
   public async getBook(@Param('id') id: string) {
     return this.bookService.getBookById(id);

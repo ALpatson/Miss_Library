@@ -54,4 +54,9 @@ export class ClientController {
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.clientService.remove(id);
   }
+
+  @Get(':id/purchases')
+  async getPurchases(@Param('id', ParseIntPipe) id: number): Promise<any[]> {
+    return this.clientService.findPurchases(id);
+  }
 }

@@ -1,3 +1,4 @@
+// react-app/src/clients/ClientModel.tsx
 
 export interface Client {
   id: number;
@@ -8,15 +9,31 @@ export interface Client {
   booksCount?: number;
 }
 
+export interface Sale {
+  id: number;
+  date: string;
+  book: {
+    id: string;
+    title: string;
+    author: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
 export interface Purchase {
   id: number;
   date: string;
   book: {
-    id: number;
+    id: string;
     title: string;
+    yearPublished: number;
     author: {
-      id: number;
-      name: string;
+      id: string;
+      firstName: string;
+      lastName: string;
+      name?: string;
     };
   };
 }
