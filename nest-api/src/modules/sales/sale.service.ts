@@ -1,5 +1,3 @@
-
-
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SaleRepository } from './sale.repository';
 import { CreateSaleDto } from './sale.dto';
@@ -54,5 +52,15 @@ export class SaleService {
 
   async findByBook(bookId: string): Promise<Sale[]> {
     return this.saleRepository.findByBookId(bookId);
+  }
+
+  async delete(id: number): Promise<void> {
+    const sale = await this.saleRepository.findOne({ where: { id } });
+    
+    if (!sale) {
+      throw new NotFoundException(`Sale with ID ${id} not found`);
+    }
+    
+    await this.saleRepository.remove(sale);
   }
 }

@@ -1,7 +1,7 @@
-import { Skeleton, Space, Typography, Button, Card, Table, Empty, Breadcrumb } from 'antd';
+import { Skeleton, Space, Typography, Button, Card, Table, Empty, Breadcrumb, Modal, App } from 'antd';
 import { useBookDetailsProvider } from '../providers/useBookDetailsProvider';
 import { useEffect, useState } from 'react';
-import { HomeOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { HomeOutlined, ShoppingCartOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from '@tanstack/react-router';
 import RecordSaleModal from './RecordSaleModal';
 import api from '../../api';
@@ -21,10 +21,16 @@ interface Buyer {
 }
 
 export const BookDetails = ({ id }: BookDetailsProps) => {
+  const { message } = App.useApp();
   const { isLoading, book, loadBook } = useBookDetailsProvider(id);
   const [modalOpen, setModalOpen] = useState(false);
   const [buyers, setBuyers] = useState<Buyer[]>([]);
   const [loadingBuyers, setLoadingBuyers] = useState(false);
+  
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [saleToDelete, setSaleToDelete] = useState<{ id: number; clientName: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadBuyers = async () => {
     setLoadingBuyers(true);
@@ -46,6 +52,34 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
 
   const handleSaleSuccess = () => {
     loadBuyers();
+  };
+
+  const handleDeleteClick = (saleId: number, clientName: string) => {
+    setSaleToDelete({ id: saleId, clientName });
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!saleToDelete) return;
+    
+    setDeleting(true);
+    try {
+      await api.delete(`/sales/${saleToDelete.id}`);
+      message.success('Sale deleted successfully!');
+      setDeleteModalOpen(false);
+      setSaleToDelete(null);
+      loadBuyers();
+    } catch (error: any) {
+      console.error('Failed to delete sale:', error);
+      message.error('Failed to delete sale');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
+    setSaleToDelete(null);
   };
 
   if (isLoading) {
@@ -73,6 +107,23 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
       dataIndex: 'date',
       key: 'date',
       render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: unknown, record: Buyer) => (
+        <Button
+          danger
+          size="small"
+          icon={<DeleteOutlined />}
+          onClick={() => handleDeleteClick(
+            record.id,
+            `${record.client.firstName} ${record.client.lastName}`
+          )}
+        >
+          Delete
+        </Button>
+      ),
     },
   ];
 
@@ -139,6 +190,22 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
         onClose={() => setModalOpen(false)}
         onSuccess={handleSaleSuccess}
       />
+
+      <Modal
+        title="Delete Sale"
+        open={deleteModalOpen}
+        onOk={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+        confirmLoading={deleting}
+      >
+        {saleToDelete && (
+          <p>
+            Are you sure you want to delete the sale to <strong>{saleToDelete.clientName}</strong>?
+          </p>
+        )}
+      </Modal>
     </div>
   );
 };
