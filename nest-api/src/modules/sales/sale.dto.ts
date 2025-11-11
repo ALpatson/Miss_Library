@@ -1,16 +1,31 @@
-
-
-import { IsNotEmpty, IsDateString, IsNumber } from 'class-validator';
+import { IsInt, IsString, IsDateString } from 'class-validator';
 
 export class CreateSaleDto {
-  @IsNumber()
-  @IsNotEmpty()
+  @IsInt()
   clientId: number;
 
-  @IsNotEmpty()
+  @IsString()
   bookId: string;
 
   @IsDateString()
-  @IsNotEmpty()
   date: string;
+}
+
+//these are new types for the purchase response
+export class PurchaseBookAuthorDto {
+  firstName: string;
+  lastName: string;
+}
+
+export class PurchaseBookDto {
+  id: string;
+  title: string;
+  yearPublished: number;
+  author: PurchaseBookAuthorDto;
+}
+
+export class PurchaseDto {
+  id: number;
+  date: string;
+  book: PurchaseBookDto;
 }

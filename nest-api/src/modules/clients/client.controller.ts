@@ -1,5 +1,3 @@
-
-
 import {
   Controller,
   Get,
@@ -15,6 +13,7 @@ import {
 import { ClientService } from './client.service';
 import { CreateClientDto, UpdateClientDto } from './client.dto';
 import { ClientModel } from './client.model';
+import { PurchaseDto } from '../sales/sale.dto';
 
 @Controller('clients')
 export class ClientController {
@@ -31,8 +30,8 @@ export class ClientController {
   }
 
   @Get(':id/purchases')
-  async findOneWithPurchases(@Param('id', ParseIntPipe) id: number): Promise<ClientModel> {
-    return this.clientService.findOneWithPurchases(id);
+  async getPurchases(@Param('id', ParseIntPipe) id: number): Promise<PurchaseDto[]> {
+    return this.clientService.findPurchases(id);
   }
 
   @Post()
@@ -53,10 +52,5 @@ export class ClientController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.clientService.remove(id);
-  }
-
-  @Get(':id/purchases')
-  async getPurchases(@Param('id', ParseIntPipe) id: number): Promise<any[]> {
-    return this.clientService.findPurchases(id);
   }
 }

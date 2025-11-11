@@ -1,4 +1,4 @@
-import { Table, Space, Button, Avatar, Modal, message } from 'antd';
+import { Table, Space, Button, Avatar, Modal, App } from 'antd';
 import { DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
@@ -11,6 +11,7 @@ interface AuthorListProps {
 }
 
 export default function AuthorList({ data, loading, onDelete }: AuthorListProps) {
+  const { message } = App.useApp();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [authorToDelete, setAuthorToDelete] = useState<Author | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -32,9 +33,27 @@ export default function AuthorList({ data, loading, onDelete }: AuthorListProps)
       message.success(`${authorToDelete.firstName} ${authorToDelete.lastName} deleted successfully!`);
       setDeleteModalOpen(false);
       setAuthorToDelete(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Delete failed:', error);
-      message.error('Failed to delete author');
+      
+      const status = error.response?.status;
+      const bookCount = authorToDelete.booksCount || 0;
+      
+      if (status === 500 || status === 400) {
+        if (bookCount > 0) {
+          message.error({
+            content: `Cannot delete ${authorToDelete.firstName} ${authorToDelete.lastName} - they have ${bookCount} book${bookCount !== 1 ? 's' : ''}. Delete their books first.`,
+            duration: 5,
+          });
+        } else {
+          message.error({
+            content: `Cannot delete ${authorToDelete.firstName} ${authorToDelete.lastName} - database constraint error.`,
+            duration: 5,
+          });
+        }
+      } else {
+        message.error(`Failed to delete ${authorToDelete.firstName} ${authorToDelete.lastName}`);
+      }
     } finally {
       setDeleting(false);
     }

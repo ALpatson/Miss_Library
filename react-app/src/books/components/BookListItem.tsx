@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { BookModel, UpdateBookModel } from '../BookModel'
-import { Button, Col, Row, Input, Select, Modal } from 'antd'
+import { Button, Col, Row, Input, Select, Modal, App } from 'antd'
 import {
   CheckOutlined,
   CloseOutlined,
@@ -17,13 +17,12 @@ interface BookListItemProps {
 }
 
 export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
+  const { message } = App.useApp();
   const [title, setTitle] = useState(book.title)
   const [yearPublished, setYearPublished] = useState(book.yearPublished)
   const [authorId, setAuthorId] = useState(book.author.id)
   const [isEditing, setIsEditing] = useState(false)
   const { authors, loadAuthors } = useBookAuthorsProviders()
-
-  // 👇 NEW STATE for delete modal
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   useEffect(() => {
@@ -44,14 +43,30 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
     setIsEditing(false)
   }
 
-  // 👇 Replaces Modal.confirm
   const handleDelete = () => {
     setDeleteModalOpen(true)
   }
 
   const handleConfirmDelete = async () => {
-    await onDelete(book.id)
-    setDeleteModalOpen(false)
+    try {
+      await onDelete(book.id);
+      message.success(`"${book.title}" deleted successfully!`);
+      setDeleteModalOpen(false);
+    } catch (error: any) {
+      console.error('Delete failed:', error);
+      
+      const status = error.response?.status;
+      
+      if (status === 500 || status === 400) {
+        message.error({
+          content: `Cannot delete "${book.title}" - it has sales records. Delete the sales first.`,
+          duration: 5,
+        });
+      } else {
+        message.error(`Failed to delete "${book.title}"`);
+      }
+      setDeleteModalOpen(false);
+    }
   }
 
   return (
@@ -145,7 +160,6 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
         </Col>
       </Row>
 
-      {/* 👇 The controlled delete modal */}
       <Modal
         title="Delete Book"
         open={deleteModalOpen}
