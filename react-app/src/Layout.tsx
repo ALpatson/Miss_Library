@@ -57,7 +57,7 @@ export function Layout({ children }: LayoutProps) {
           color: 'white',
         }}
       >
-        <h2 style={{ marginTop: '0',  paddingLeft: '20px', paddingTop: '10px'}}>Miss_Library</h2>
+        <h2 style={{ marginTop: '0' }}>Babel&apos;s Library</h2>
         <Menu mode="horizontal" items={items} />
       </div>
       <div style={{ width: '100%', overflowY: 'scroll' }}>{children}</div>
