@@ -12,7 +12,7 @@ export default function AuthorsPage() {
 
   useEffect(() => {
     loadAuthors();
-  }, [loadAuthors]);
+  }, []);
 
   return (
     <div

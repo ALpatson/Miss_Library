@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { BookModel, UpdateBookModel } from '../BookModel'
-
-import { Button, Col, Row, Input, Select, Modal, App, Card } from 'antd'
+import { Button, Col, Row, Input, Select, Modal, App, Card, Badge } from 'antd'
 import {
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
 import { Link } from '@tanstack/react-router'
 import { useBookAuthorsProviders } from '../providers/useBookAuthorsProviders'
@@ -90,7 +90,7 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
             alignItems: 'center',
           }}
         >
-          <Col span={16} style={{ paddingLeft: '8px' }}>
+          <Col span={14} style={{ paddingLeft: '8px' }}>
             {isEditing ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div>
@@ -137,15 +137,21 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
                   <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px', color: '#1890ff' }}>
                     {book.title}
                   </div>
-                  <div style={{ fontSize: '14px', color: '#666' }}>
+                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>
                     by <span style={{ fontWeight: '500' }}>{book.author.firstName} {book.author.lastName}</span>
                   </div>
+                  {(book.salesCount !== undefined && book.salesCount > 0) && (
+                    <div style={{ fontSize: '13px', color: '#52c41a', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <UserOutlined />
+                      <span>{book.salesCount} {book.salesCount === 1 ? 'client' : 'clients'} bought this book</span>
+                    </div>
+                  )}
                 </div>
               </Link>
             )}
           </Col>
           <Col
-            span={8}
+            span={10}
             style={{
               display: 'flex',
               gap: '8px',
