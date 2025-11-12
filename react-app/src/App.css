@@ -39,3 +39,122 @@
 .read-the-docs {
   color: #888;
 }
+
+body {
+    /* Set the default font for anything not specified */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* 2. --- Hero Section (Background) --- */
+.hero-section {
+    background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1920');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+}
+
+/* 3. --- Content Layout (Flexbox) --- */
+.hero-content {
+    /* We use min-height to ensure it fills the screen */
+    min-height: 100vh; 
+    
+    /* Flexbox properties to position the card */
+    display: flex;
+    justify-content: flex-start; /* Aligns card to the left */
+    align-items: center;       /* Aligns card to the center vertically */
+    
+    /* This was the padding-left from your inline style */
+    padding-left: 60px;
+}
+
+/* 4. --- Info Card (The Box) --- */
+.info-card {
+    background-color: #395E66;
+    color: white;
+    border-radius: 30px;
+    padding: 50px 60px;
+    box-shadow: 6px 6px 12px rgba(0,0,0,0.3);
+    
+    /* This ensures the text inside is left-aligned */
+    text-align: left; 
+    
+    /* --- THIS IS THE FIX FOR SCALABILITY --- */
+    max-width: 400px; /* It won't get bigger than 400px */
+    width: 100%;      /* It will shrink to fit smaller screens */
+}
+
+/* 5. --- Card Typography --- */
+.info-card h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    line-height: 1.1;
+    margin-bottom: 10px;
+}
+
+.info-card p {
+    font-family: 'Poppins', sans-serif;
+    font-style: italic;
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+/* 6. --- Button Styles --- */
+.button-group {
+    display: flex;
+    gap: 15px; /* Spacing between buttons */
+}
+
+.btn {
+    background-color: #d9d9d9;
+    color: #333; /* Dark text for readability */
+    border: none;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif; /* Ensure buttons use the right font */
+    
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    
+    /* Smooth transition for the hover effect */
+    transition: background-color 0.3s ease;
+}
+
+/* --- THE POWER OF CSS: HOVER EFFECTS --- */
+.btn:hover {
+    background-color: #f0f0f0; /* A slightly lighter, brighter color */
+}
+
+
+/* 7. --- RESPONSIVENESS (Scalability) --- */
+
+/* This "media query" applies styles ONLY when the screen is 768px or less */
+@media (max-width: 768px) {
+    
+    .hero-content {
+        /* On mobile, center the card instead of left-aligning */
+        justify-content: center;
+        
+        /* Remove the side padding and use simpler padding */
+        padding: 20px;
+    }
+    
+    .info-card {
+        /* Make padding slightly smaller for mobile */
+        padding: 40px 30px;
+    }
+    
+    .info-card h1 {
+        /* Make the font a little smaller on small screens */
+        font-size: 40px;
+    }
+    
+    .button-group {
+        /* Stack the buttons vertically on mobile */
+        flex-direction: column;
+    }
+    
+    .btn {
+        /* Make sure text is centered when buttons are stacked */
+        text-align: center;
+    }
+}
