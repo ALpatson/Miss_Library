@@ -140,8 +140,8 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
                   <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>
                     by <span style={{ fontWeight: '500' }}>{book.author.firstName} {book.author.lastName}</span>
                   </div>
-                  {(book.salesCount !== undefined && book.salesCount > 0) && (
-                    <div style={{ fontSize: '13px', color: '#52c41a', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  {book.salesCount !== undefined && (
+                    <div style={{ fontSize: '13px', color: book.salesCount > 0 ? '#52c41a' : '#999', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <UserOutlined />
                       <span>{book.salesCount} {book.salesCount === 1 ? 'client' : 'clients'} bought this book</span>
                     </div>

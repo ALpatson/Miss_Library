@@ -11,9 +11,26 @@ export const useBookProvider = () => {
     setLoading(true)
     try {
       const response = await axios.get('http://localhost:3000/books');
-      setBooks(response.data.data || response.data);
+      const booksData = response.data.data || response.data;
+      
+      // For each book, get sales count
+      const booksWithSales = await Promise.all(
+        booksData.map(async (book: BookModel) => {
+          try {
+            const salesResponse = await axios.get(`http://localhost:3000/sales/book/${book.id}`);
+            const sales = salesResponse.data.data || salesResponse.data || [];
+            return { ...book, salesCount: sales.length };
+          } catch (err) {
+            // If endpoint doesn't exist or errors, just return book with 0 sales
+            return { ...book, salesCount: 0 };
+          }
+        })
+      );
+      
+      setBooks(booksWithSales);
     } catch (err) {
       console.error('Failed to load books:', err);
+      setBooks([]);
     } finally {
       setLoading(false)
     }
@@ -22,10 +39,21 @@ export const useBookProvider = () => {
   const loadBookDetails = async (id: string) => {
     setLoading(true)
     try {
-      const response = await axios.get(`http://localhost:3000/books/${id}`);
-      setBookDetails(response.data.data || response.data);
+      const bookResponse = await axios.get(`http://localhost:3000/books/${id}`);
+      const book = bookResponse.data.data || bookResponse.data;
+      
+      // Try to load sales for this book
+      try {
+        const salesResponse = await axios.get(`http://localhost:3000/sales/book/${id}`);
+        const sales = salesResponse.data.data || salesResponse.data || [];
+        setBookDetails({ ...book, sales });
+      } catch (err) {
+        // If sales endpoint doesn't exist, just show book without sales
+        setBookDetails({ ...book, sales: [] });
+      }
     } catch (err) {
       console.error('Failed to load book details:', err);
+      setBookDetails(null);
     } finally {
       setLoading(false)
     }
@@ -45,7 +73,6 @@ export const useBookProvider = () => {
     try {
       await axios.patch(`http://localhost:3000/books/${id}`, input);
       await loadBooks();
-      // Reload details if we're viewing this book
       if (bookDetails?.id === id) {
         await loadBookDetails(id);
       }
@@ -68,11 +95,10 @@ export const useBookProvider = () => {
   const createSale = async (sale: CreateSaleModel) => {
     try {
       await axios.post('http://localhost:3000/sales', sale);
-      // Reload book details to show new sale
       if (bookDetails) {
         await loadBookDetails(bookDetails.id);
       }
-      await loadBooks(); // Refresh list to update counts
+      await loadBooks();
     } catch (err) {
       console.error('Failed to create sale:', err);
       throw err;
