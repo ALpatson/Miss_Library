@@ -11,9 +11,8 @@ A full-stack library management system built with **NestJS** and **React** to ma
 ## 👥 **Team Members**
 
 - Alpatson Cobbina SIAW
-- Josephine Ama Gyanewah  
+- Josephine Ama Gyanewah GYASI
 - Kwabena ANOKYE
-- Member 4 Name
 
 ---
 
