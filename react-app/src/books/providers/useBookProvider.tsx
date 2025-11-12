@@ -1,3 +1,4 @@
+//useBookProvider
 import { useState } from 'react'
 import type { BookModel, CreateBookModel, UpdateBookModel, BookDetailsModel, CreateSaleModel } from '../BookModel'
 import axios from 'axios'
@@ -17,12 +18,17 @@ export const useBookProvider = () => {
       const booksWithSales = await Promise.all(
         booksData.map(async (book: BookModel) => {
           try {
-            const salesResponse = await axios.get(`http://localhost:3000/sales/book/${book.id}`);
-            const sales = salesResponse.data.data || salesResponse.data || [];
-            return { ...book, salesCount: sales.length };
+            const salesResponse = await axios.get(`http://localhost:3000/books/${book.id}/buyers`);
+            const buyers = salesResponse.data || [];
+            return { ...book, salesCount: buyers.length };
           } catch (err) {
-            // If endpoint doesn't exist or errors, just return book with 0 sales
-            return { ...book, salesCount: 0 };
+            try {
+              const salesResponse2 = await axios.get(`http://localhost:3000/sales/book/${book.id}`);
+              const sales = salesResponse2.data.data || salesResponse2.data || [];
+              return { ...book, salesCount: sales.length };
+            } catch (err2) {
+              return { ...book, salesCount: 0 };
+            }
           }
         })
       );
@@ -42,14 +48,18 @@ export const useBookProvider = () => {
       const bookResponse = await axios.get(`http://localhost:3000/books/${id}`);
       const book = bookResponse.data.data || bookResponse.data;
       
-      // Try to load sales for this book
       try {
-        const salesResponse = await axios.get(`http://localhost:3000/sales/book/${id}`);
-        const sales = salesResponse.data.data || salesResponse.data || [];
-        setBookDetails({ ...book, sales });
+        const salesResponse = await axios.get(`http://localhost:3000/books/${id}/buyers`);
+        const buyers = salesResponse.data || [];
+        setBookDetails({ ...book, sales: buyers });
       } catch (err) {
-        // If sales endpoint doesn't exist, just show book without sales
-        setBookDetails({ ...book, sales: [] });
+        try {
+          const salesResponse = await axios.get(`http://localhost:3000/sales/book/${id}`);
+          const sales = salesResponse.data.data || salesResponse.data || [];
+          setBookDetails({ ...book, sales });
+        } catch (err2) {
+          setBookDetails({ ...book, sales: [] });
+        }
       }
     } catch (err) {
       console.error('Failed to load book details:', err);
@@ -61,6 +71,7 @@ export const useBookProvider = () => {
 
   const createBook = async (book: CreateBookModel) => {
     try {
+      console.log('Creating book:', book);
       await axios.post('http://localhost:3000/books', book);
       await loadBooks();
     } catch (err) {
@@ -71,6 +82,7 @@ export const useBookProvider = () => {
 
   const updateBook = async (id: string, input: UpdateBookModel) => {
     try {
+      console.log('Updating book:', id, 'with:', input);
       await axios.patch(`http://localhost:3000/books/${id}`, input);
       await loadBooks();
       if (bookDetails?.id === id) {

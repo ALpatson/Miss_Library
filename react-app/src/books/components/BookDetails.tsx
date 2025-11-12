@@ -1,3 +1,5 @@
+//BookDetails
+
 import { Skeleton, Space, Typography, Button, Card, Table, Empty, Breadcrumb, Modal, App, Descriptions, Input, Select } from 'antd';
 import { useBookDetailsProvider } from '../providers/useBookDetailsProvider';
 import { useEffect, useState } from 'react';
@@ -36,6 +38,7 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
   const [title, setTitle] = useState('');
   const [yearPublished, setYearPublished] = useState(0);
   const [authorId, setAuthorId] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
   
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -65,6 +68,7 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
       setTitle(book.title);
       setYearPublished(book.yearPublished);
       setAuthorId(book.author?.id || '');
+      setPhotoUrl(book.photoUrl || '');
     }
   }, [book]);
 
@@ -76,7 +80,7 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
 
   const handleSaleSuccess = () => {
     loadBuyers();
-    loadBook(); // Reload book to update any counts
+    loadBook();
   };
 
   const handleEdit = () => {
@@ -88,6 +92,7 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
       setTitle(book.title);
       setYearPublished(book.yearPublished);
       setAuthorId(book.author?.id || '');
+      setPhotoUrl(book.photoUrl || '');
     }
     setIsEditing(false);
   };
@@ -99,13 +104,26 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
         yearPublished,
         authorId,
       };
+      
+      // Only add photoUrl if it's not empty
+      if (photoUrl && photoUrl.trim() !== '') {
+        updates.photoUrl = photoUrl.trim();
+      }
+      
+      console.log('Sending update:', updates);
+      
       await api.patch(`/books/${id}`, updates);
       message.success('Book updated successfully!');
       setIsEditing(false);
-      loadBook(); // Reload to show updated data
-    } catch (error) {
+      await loadBook();
+    } catch (error: unknown) {
       console.error('Failed to update book:', error);
-      message.error('Failed to update book');
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        message.error(`Failed to update book: ${axiosError.response?.data?.message || 'Unknown error'}`);
+      } else {
+        message.error('Failed to update book');
+      }
     }
   };
 
@@ -124,8 +142,8 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
       setDeleteModalOpen(false);
       setSaleToDelete(null);
       loadBuyers();
-      loadBook(); // Reload to update counts
-    } catch (error: any) {
+      loadBook();
+    } catch (error) {
       console.error('Failed to delete sale:', error);
       message.error('Failed to delete sale');
     } finally {
@@ -173,7 +191,7 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
     },
     {
       title: 'Purchase Date',
-      dataIndex: 'date',
+      dataIndex: 'date' as const,
       key: 'date',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
@@ -197,135 +215,184 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
   ];
 
   return (
-  <div style={{
-    minHeight: '100vh',
-    backgroundImage: 'url(https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1920)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    padding: '24px',
-  }}>
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <Breadcrumb
-        style={{
+    <div style={{
+      minHeight: '100vh',
+      backgroundImage: 'url(https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1920)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      padding: '24px',
+    }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <Breadcrumb
+          style={{
+            marginBottom: '16px',
+            backgroundColor: 'transparent',
+            borderRadius: '8px',
+            color: '#ffffff',
+          }}
+          separator={<span style={{ color: '#ffffff' }}>/</span>}
+          items={[
+            {
+              title: (
+                // @ts-ignore
+                <Link to="/" style={{ color: '#ffffff' }}>
+                  <HomeOutlined style={{ color: '#ffffff' }}/>
+                </Link>
+              ),
+            },
+            {
+              title: (
+                // @ts-ignore
+                <Link to="/books" style={{ color: '#ffffff' }}>Books</Link>
+              ),
+            },
+            {
+              title: <span style={{ color: '#ffffff' }}>{book?.title || 'Loading...'}</span>,
+            },
+          ]}
+        />
+
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginBottom: '16px',
-          backgroundColor: 'transparent',
-          borderRadius: '8px',
-          color: '#ffffff',
-        }}
-        separator={<span style={{ color: '#ffffff' }}>/</span>}
-        items={[
-          {
-            title: (
-              // @ts-ignore
-              <Link to="/" style={{ color: '#ffffff' }}>
-                <HomeOutlined style={{ color: '#ffffff' }}/>
-              </Link>
-            ),
-          },
-          {
-            title: (
-              // @ts-ignore
-              <Link to="/books" style={{ color: '#ffffff' }}>Books</Link>
-            ),
-          },
-          {
-            title: <span style={{ color: '#ffffff' }}>{book?.title || 'Loading...'}</span>,
-          },
-        ]}
-      />
-
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '16px',
-      }}>
-        <h1 style={{
-          color: '#fff',
-          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-          margin: 0,
         }}>
-          {book?.title}
-        </h1>
-      </div>
+          <h1 style={{
+            color: '#fff',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+            margin: 0,
+          }}>
+            {book?.title}
+          </h1>
+        </div>
 
-      <Card 
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '12px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-          marginBottom: '24px',
-        }}
-      >
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography.Title level={3} style={{ margin: 0 }}>
-              Book Information
-            </Typography.Title>
-            <Space>
-              {isEditing ? (
-                <>
-                  <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveEdit}>
-                    Save
-                  </Button>
-                  <Button icon={<CloseOutlined />} onClick={handleCancelEdit}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-                    Edit Book
-                  </Button>
-                  <Button
-                    type="primary"
-                    icon={<ShoppingCartOutlined />}
-                    onClick={() => setModalOpen(true)}
-                    style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
-                  >
-                    Record Sale
-                  </Button>
-                </>
-              )}
-            </Space>
-          </div>
+        <Card 
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '12px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+            marginBottom: '24px',
+          }}
+        >
+          <Space direction="vertical" style={{ width: '100%' }} size="large">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography.Title level={3} style={{ margin: 0 }}>
+                Book Information
+              </Typography.Title>
+              <Space>
+                {isEditing ? (
+                  <>
+                    <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveEdit}>
+                      Save
+                    </Button>
+                    <Button icon={<CloseOutlined />} onClick={handleCancelEdit}>
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
+                      Edit Book
+                    </Button>
+                    <Button
+                      type="primary"
+                      icon={<ShoppingCartOutlined />}
+                      onClick={() => setModalOpen(true)}
+                      style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                    >
+                      Record Sale
+                    </Button>
+                  </>
+                )}
+              </Space>
+            </div>
 
-            <Descriptions bordered column={1}>
-              <Descriptions.Item label="Title">
+            <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+              <div style={{ textAlign: 'center' }}>
                 {isEditing ? (
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+                  <div>
+                    <img
+                      src={photoUrl || 'https://via.placeholder.com/150x220?text=Book'}
+                      alt={title}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/150x220?text=Book';
+                      }}
+                      style={{
+                        width: '150px',
+                        height: '220px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        marginBottom: '8px',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                      }}
+                    />
+                    <Input
+                      placeholder="Book Photo URL"
+                      value={photoUrl}
+                      onChange={(e) => setPhotoUrl(e.target.value)}
+                      style={{ marginTop: '8px', width: '150px' }}
+                    />
+                  </div>
                 ) : (
-                  <strong style={{ fontSize: '16px' }}>{book?.title}</strong>
-                )}
-              </Descriptions.Item>
-              <Descriptions.Item label="Author">
-                {isEditing ? (
-                  <Select
-                    style={{ width: '100%' }}
-                    value={authorId}
-                    options={authors.map(author => ({
-                      label: `${author.firstName} ${author.lastName}`,
-                      value: author.id,
-                    }))}
-                    onChange={value => setAuthorId(value)}
+                  <img
+                    src={book?.photoUrl || 'https://via.placeholder.com/150x220?text=Book'}
+                    alt={book?.title}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/150x220?text=Book';
+                    }}
+                    style={{
+                      width: '150px',
+                      height: '220px',
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                    }}
                   />
-                ) : (
-                  book?.author ? `${book.author.firstName} ${book.author.lastName}` : 'Unknown Author'
                 )}
-              </Descriptions.Item>
-              <Descriptions.Item label="Year Published">
-                {isEditing ? (
-                  <Input
-                    type="number"
-                    value={yearPublished}
-                    onChange={(e) => setYearPublished(Number(e.target.value))}
-                  />
-                ) : (
-                  book?.yearPublished
-                )}
-              </Descriptions.Item>
-            </Descriptions>
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <Descriptions bordered column={1}>
+                  <Descriptions.Item label="Title">
+                    {isEditing ? (
+                      <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+                    ) : (
+                      <strong style={{ fontSize: '16px' }}>{book?.title}</strong>
+                    )}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Author">
+                    {isEditing ? (
+                      <Select
+                        style={{ width: '100%' }}
+                        value={authorId}
+                        options={authors.map(author => ({
+                          label: `${author.firstName} ${author.lastName}`,
+                          value: author.id,
+                        }))}
+                        onChange={value => setAuthorId(value)}
+                      />
+                    ) : (
+                      book?.author ? `${book.author.firstName} ${book.author.lastName}` : 'Unknown Author'
+                    )}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Year Published">
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        value={yearPublished}
+                        onChange={(e) => setYearPublished(Number(e.target.value))}
+                      />
+                    ) : (
+                      book?.yearPublished
+                    )}
+                  </Descriptions.Item>
+                </Descriptions>
+              </div>
+            </div>
           </Space>
         </Card>
 
