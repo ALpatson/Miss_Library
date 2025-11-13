@@ -11,7 +11,7 @@ export class CreateSaleDto {
   date: string;
 }
 
-//these are new types for the purchase response
+
 export class PurchaseBookAuthorDto {
   firstName: string;
   lastName: string;

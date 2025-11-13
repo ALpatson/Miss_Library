@@ -1,5 +1,4 @@
 
-
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Sale } from './entities/sale.entity';

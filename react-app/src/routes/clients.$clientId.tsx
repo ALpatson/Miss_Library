@@ -190,7 +190,6 @@ function ClientDetailsPage() {
           items={[
             {
               title: (
-                // @ts-ignore
                 <Link to="/" style={{ color: '#ffffff' }}>
                   <HomeOutlined style={{ color: '#ffffff' }}/>
                 </Link>
@@ -198,7 +197,6 @@ function ClientDetailsPage() {
             },
             {
               title: (
-                // @ts-ignore
                 <Link to="/clients" style={{ color: '#ffffff' }}>Clients</Link>
               ),
             },

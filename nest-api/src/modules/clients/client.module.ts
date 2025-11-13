@@ -9,7 +9,7 @@ import { SaleModule } from '../sales/sale.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Client]),
-    forwardRef(() => SaleModule), // ← Changed this line
+    forwardRef(() => SaleModule), 
   ],
   controllers: [ClientController],
   providers: [ClientService, ClientRepository],

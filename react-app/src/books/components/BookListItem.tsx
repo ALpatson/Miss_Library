@@ -1,4 +1,3 @@
-//Book list item
 
 import { useEffect, useState } from 'react'
 import type { BookModel, UpdateBookModel } from '../BookModel'

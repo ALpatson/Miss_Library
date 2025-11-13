@@ -1,4 +1,3 @@
-//BookDetails
 
 import { Skeleton, Space, Typography, Button, Card, Table, Empty, Breadcrumb, Modal, App, Descriptions, Input, Select } from 'antd';
 import { useBookDetailsProvider } from '../providers/useBookDetailsProvider';
@@ -235,7 +234,6 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
           items={[
             {
               title: (
-                // @ts-ignore
                 <Link to="/" style={{ color: '#ffffff' }}>
                   <HomeOutlined style={{ color: '#ffffff' }}/>
                 </Link>
@@ -243,7 +241,6 @@ export const BookDetails = ({ id }: BookDetailsProps) => {
             },
             {
               title: (
-                // @ts-ignore
                 <Link to="/books" style={{ color: '#ffffff' }}>Books</Link>
               ),
             },

@@ -1,5 +1,4 @@
 
-
 import { useEffect, useState, useCallback } from 'react';
 import api from '../../api';
 import type { Client } from '../ClientModel';

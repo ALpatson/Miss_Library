@@ -1,5 +1,3 @@
-// react-app/src/api.ts
-// react-app/src/api.ts
 
 import axios from 'axios';
 

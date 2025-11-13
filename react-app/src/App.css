@@ -45,7 +45,7 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-/* 2. --- Hero Section (Background) --- */
+
 .hero-section {
     background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=1920');
     background-size: cover;
@@ -53,9 +53,9 @@ body {
     min-height: 100vh;
 }
 
-/* 3. --- Content Layout (Flexbox) --- */
+
 .hero-content {
-    /* We use min-height to ensure it fills the screen */
+    
     min-height: 100vh; 
     
     /* Flexbox properties to position the card */
@@ -67,7 +67,7 @@ body {
     padding-left: 60px;
 }
 
-/* 4. --- Info Card (The Box) --- */
+
 .info-card {
     background-color: #395E66;
     color: white;
@@ -78,12 +78,12 @@ body {
     /* This ensures the text inside is left-aligned */
     text-align: left; 
     
-    /* --- THIS IS THE FIX FOR SCALABILITY --- */
+    
     max-width: 400px; /* It won't get bigger than 400px */
     width: 100%;      /* It will shrink to fit smaller screens */
 }
 
-/* 5. --- Card Typography --- */
+
 .info-card h1 {
     font-family: 'Playfair Display', serif;
     font-size: 48px;
@@ -98,7 +98,7 @@ body {
     margin-bottom: 30px;
 }
 
-/* 6. --- Button Styles --- */
+
 .button-group {
     display: flex;
     gap: 15px; /* Spacing between buttons */
@@ -119,13 +119,12 @@ body {
     transition: background-color 0.3s ease;
 }
 
-/* --- THE POWER OF CSS: HOVER EFFECTS --- */
 .btn:hover {
     background-color: #f0f0f0; /* A slightly lighter, brighter color */
 }
 
 
-/* 7. --- RESPONSIVENESS (Scalability) --- */
+
 
 /* This "media query" applies styles ONLY when the screen is 768px or less */
 @media (max-width: 768px) {

@@ -52,7 +52,6 @@ export default function ClientsPage() {
         items={[
           {
             title: (
-              // @ts-ignore
               <Link to="/" style={{ color: '#ffffff' }}>
                 <HomeOutlined style={{ color: '#ffffff' }}/>
               </Link>

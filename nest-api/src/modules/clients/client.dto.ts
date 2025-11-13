@@ -1,5 +1,4 @@
 
-
 import { IsString, IsEmail, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
 
 export class CreateClientDto {

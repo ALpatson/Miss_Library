@@ -1,5 +1,3 @@
-// TypeScript interfaces for Author feature
-
 export interface Author {
   id: string;
   firstName: string;

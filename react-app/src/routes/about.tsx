@@ -42,7 +42,7 @@ function AboutPage() {
                 marginBottom: '0.2em',
               }}
             >
-              Miss Library
+              Miss_Library
             </Title>
 
             <Paragraph

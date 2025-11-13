@@ -10,7 +10,7 @@ import { BookEntity } from '../books/entities/book.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Sale, BookEntity]),
-    forwardRef(() => ClientModule), // ← Changed this line
+    forwardRef(() => ClientModule), 
   ],
   controllers: [SaleController],
   providers: [SaleService, SaleRepository],

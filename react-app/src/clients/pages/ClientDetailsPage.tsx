@@ -15,14 +15,12 @@ export function ClientDetailsPage() {
         items={[
           {
             title: (
-              // @ts-ignore
               <Link to="/">
                 <HomeOutlined />
               </Link>
             ),
           },
           {
-            // @ts-ignore
             title: <Link to="/clients">Clients</Link>,
           },
           {
