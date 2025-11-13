@@ -12,6 +12,10 @@ export class CreateBookDto {
   @Min(1500)
   @Max(2025)
   yearPublished: number;
+
+  @IsOptional()
+  @IsString()
+  photoUrl?: string;
 }
 
 export class UpdateBookDto {
@@ -28,6 +32,10 @@ export class UpdateBookDto {
   @Max(2025)
   @IsOptional()
   yearPublished: number;
+
+  @IsOptional()
+  @IsString()
+  photoUrl?: string; 
 }
 
 export class GetBooksDto {

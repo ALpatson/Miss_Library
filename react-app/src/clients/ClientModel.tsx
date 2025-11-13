@@ -9,6 +9,13 @@ export interface Client {
   booksCount?: number;
 }
 
+export interface UpdateClientDto {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  photoUrl?: string;
+}
+
 export interface Sale {
   id: number;
   date: string;

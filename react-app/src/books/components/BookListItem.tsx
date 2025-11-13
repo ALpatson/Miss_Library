@@ -1,6 +1,8 @@
+//Book list item
+
 import { useEffect, useState } from 'react'
 import type { BookModel, UpdateBookModel } from '../BookModel'
-import { Button, Col, Row, Input, Select, Modal, App, Card, Badge } from 'antd'
+import { Button, Col, Row, Input, Select, Modal, App, Card } from 'antd'
 import {
   CheckOutlined,
   CloseOutlined,
@@ -22,6 +24,7 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
   const [title, setTitle] = useState(book.title)
   const [yearPublished, setYearPublished] = useState(book.yearPublished)
   const [authorId, setAuthorId] = useState(book.author.id)
+  const [photoUrl, setPhotoUrl] = useState(book.photoUrl || '')
   const [isEditing, setIsEditing] = useState(false)
   const { authors, loadAuthors } = useBookAuthorsProviders()
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -37,11 +40,28 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
     setTitle(book.title)
     setYearPublished(book.yearPublished)
     setAuthorId(book.author.id)
+    setPhotoUrl(book.photoUrl || '')
   }
 
-  const onValidateEdit = () => {
-    onUpdate(book.id, { title, yearPublished, authorId })
-    setIsEditing(false)
+  const onValidateEdit = async () => {
+    try {
+      const updates: UpdateBookModel = {
+        title,
+        yearPublished,
+        authorId,
+      };
+      
+      if (photoUrl && photoUrl.trim() !== '') {
+        updates.photoUrl = photoUrl.trim();
+      }
+      
+      await onUpdate(book.id, updates)
+      setIsEditing(false)
+      message.success('Book updated successfully!')
+    } catch (error) {
+      console.error('Update failed:', error)
+      message.error('Failed to update book')
+    }
   }
 
   const handleDelete = () => {
@@ -53,16 +73,21 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
       await onDelete(book.id);
       message.success(`"${book.title}" deleted successfully!`);
       setDeleteModalOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Delete failed:', error);
       
-      const status = error.response?.status;
-      
-      if (status === 500 || status === 400) {
-        message.error({
-          content: `Cannot delete "${book.title}" - it has sales records. Delete the sales first.`,
-          duration: 5,
-        });
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        const status = axiosError.response?.status;
+        
+        if (status === 500 || status === 400) {
+          message.error({
+            content: `Cannot delete "${book.title}" - it has sales records. Delete the sales first.`,
+            duration: 5,
+          });
+        } else {
+          message.error(`Failed to delete "${book.title}"`);
+        }
       } else {
         message.error(`Failed to delete "${book.title}"`);
       }
@@ -122,6 +147,14 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
                     onChange={e => setYearPublished(Number(e.target.value))} 
                   />
                 </div>
+                <div>
+                  <label style={{ fontWeight: 'bold', marginBottom: '4px', display: 'block' }}>Photo URL:</label>
+                  <Input 
+                    placeholder="https://example.com/book-cover.jpg"
+                    value={photoUrl} 
+                    onChange={e => setPhotoUrl(e.target.value)} 
+                  />
+                </div>
               </div>
             ) : (
               <Link
@@ -133,19 +166,36 @@ export function BookListItem({ book, onDelete, onUpdate }: BookListItemProps) {
                   display: 'block',
                 }}
               >
-                <div>
-                  <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px', color: '#1890ff' }}>
-                    {book.title}
-                  </div>
-                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>
-                    by <span style={{ fontWeight: '500' }}>{book.author.firstName} {book.author.lastName}</span>
-                  </div>
-                  {(book.salesCount !== undefined && book.salesCount > 0) && (
-                    <div style={{ fontSize: '13px', color: '#52c41a', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <UserOutlined />
-                      <span>{book.salesCount} {book.salesCount === 1 ? 'client' : 'clients'} bought this book</span>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <img
+                    src={book.photoUrl || 'https://via.placeholder.com/80x120?text=Book'}
+                    alt={book.title}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/80x120?text=Book';
+                    }}
+                    style={{
+                      width: '80px',
+                      height: '120px',
+                      objectFit: 'cover',
+                      borderRadius: '6px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px', color: '#1890ff' }}>
+                      {book.title}
                     </div>
-                  )}
+                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>
+                      by <span style={{ fontWeight: '500' }}>{book.author.firstName} {book.author.lastName}</span>
+                    </div>
+                    {book.salesCount !== undefined && (
+                      <div style={{ fontSize: '13px', color: book.salesCount > 0 ? '#52c41a' : '#999', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <UserOutlined />
+                        <span>{book.salesCount} {book.salesCount === 1 ? 'client' : 'clients'} bought this book</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Link>
             )}
